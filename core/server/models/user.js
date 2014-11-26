@@ -718,7 +718,8 @@ User = ghostBookshelf.Model.extend({
             // it's possible that the token might get URI encoded, which breaks it
             // we replace any `=`s with `-`s as they aren't valid base64 characters
             // but are valid in a URL, so won't suffer encoding issues
-            return new Buffer(text).toString('base64').replace('=', '-');
+            var token = new Buffer(text).toString('base64');
+            return token.replace(/=/g, '-');
         });
     },
 
@@ -727,8 +728,8 @@ User = ghostBookshelf.Model.extend({
         // TODO: Is there a chance the use of ascii here will cause problems if oldPassword has weird characters?
         // We replaced `=`s with `-`s when we sent the token via email, so
         // now we reverse that change to get a valid base64 string to decode
-        token = token.replace('-', '=');
-        var tokenText = new Buffer(token, 'base64').toString('ascii'),
+        tokenB64 = token.replace(/-/g, '=');
+        var tokenText = new Buffer(tokenB64, 'base64').toString('ascii'),
             parts,
             expires,
             email;
